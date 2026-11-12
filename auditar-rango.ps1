@@ -61,28 +61,28 @@ function Numero-A-IP { param($n)
 Write-Host (Seccion "VALIDACION")
 $nd = IP-A-Numero $Desde
 $nh = IP-A-Numero $Hasta
-if ($null -eq $nd) { Write-Host (Fila "-Desde" "$rojo● invalida: '$Desde' no es una IP valida (ej: 1.2.3.4)$R") }
-if ($null -eq $nh) { Write-Host (Fila "-Hasta" "$rojo● invalida: '$Hasta' no es una IP valida (ej: 1.2.3.4)$R") }
+if ($null -eq $nd) { Write-Host (Fila "-Desde" "$rojo● invalida: '$Desde' no es una IP valida (ej: 1.2.3.4)$RST") }
+if ($null -eq $nh) { Write-Host (Fila "-Hasta" "$rojo● invalida: '$Hasta' no es una IP valida (ej: 1.2.3.4)$RST") }
 if ($null -eq $nd -or $null -eq $nh) { Write-Host ""; exit 1 }
-Write-Host (Fila "-Desde" "$verde● $Desde$R")
-Write-Host (Fila "-Hasta" "$verde● $Hasta$R")
+Write-Host (Fila "-Desde" "$verde● $Desde$RST")
+Write-Host (Fila "-Hasta" "$verde● $Hasta$RST")
 
 if ($nh -lt $nd) {
-  Write-Host (Texto "$rojo✖ -Hasta tiene que ser igual o mayor que -Desde$R`n"); exit 1
+  Write-Host (Texto "$rojo✖ -Hasta tiene que ser igual o mayor que -Desde$RST`n"); exit 1
 }
 $total = $nh - $nd + 1
 if ($total -gt 64) {
-  Write-Host (Texto "$rojo✖ Ese rango tiene $total direcciones: el tope por corrida es 64.$R")
-  Write-Host (Texto "$gris   Partilo en tandas mas chicas.$R`n"); exit 1
+  Write-Host (Texto "$rojo✖ Ese rango tiene $total direcciones: el tope por corrida es 64.$RST")
+  Write-Host (Texto "$gris   Partilo en tandas mas chicas.$RST`n"); exit 1
 }
-Write-Host (Fila "Direcciones a revisar" "$blanco$total$R")
+Write-Host (Fila "Direcciones a revisar" "$blanco$total$RST")
 Write-Host ""
 
 # --- 2) Resumen antes de empezar + autorizacion --------------------------------
 Write-Host (Seccion "RESUMEN")
-Write-Host (Fila "Rango" "$blanco$Desde  →  $Hasta$R")
-Write-Host (Fila "Cantidad de IP" "$blanco$total$R")
-Write-Host (Fila "Modo" "$blanco$(if($SoloVivos){'solo ver si responden'}else{'responde + puertos abiertos'})$R")
+Write-Host (Fila "Rango" "$blanco$Desde  →  $Hasta$RST")
+Write-Host (Fila "Cantidad de IP" "$blanco$total$RST")
+Write-Host (Fila "Modo" "$blanco$(if($SoloVivos){'solo ver si responden'}else{'responde + puertos abiertos'})$RST")
 $rutaReporte = $null
 if (-not $SinReporte) {
   if (-not $Reporte) {
@@ -90,23 +90,23 @@ if (-not $SinReporte) {
     New-Item -ItemType Directory -Path $dirRep -Force | Out-Null
     $rutaReporte = Join-Path $dirRep ("rango-{0}.txt" -f (Get-Date -Format "yyyyMMdd-HHmmss"))
   } else { $rutaReporte = $Reporte }
-  Write-Host (Fila "Reporte" "$blanco$rutaReporte$R")
+  Write-Host (Fila "Reporte" "$blanco$rutaReporte$RST")
 } else {
-  Write-Host (Fila "Reporte" "$gris no se va a guardar$R")
+  Write-Host (Fila "Reporte" "$gris no se va a guardar$RST")
 }
 Write-Host ""
-Write-Host (Texto "$amar⚠ Cada una de esas IP tiene que ser tuya o estar autorizada.$R")
-Write-Host (Texto "$gris  Si forman parte de un bloque de un proveedor compartido con$R")
-Write-Host (Texto "$gris  otros clientes, esto NO te autoriza a escanear las de otros.$R")
+Write-Host (Texto "$amar⚠ Cada una de esas IP tiene que ser tuya o estar autorizada.$RST")
+Write-Host (Texto "$gris  Si forman parte de un bloque de un proveedor compartido con$RST")
+Write-Host (Texto "$gris  otros clientes, esto NO te autoriza a escanear las de otros.$RST")
 Write-Host ""
 $ok1 = Read-Host "  Escribi 'si' si TODAS esas IP son tuyas o estan autorizadas"
-if ($ok1 -ne "si") { Write-Host "`n  $rojo✖ Cancelado.$R`n"; exit 1 }
+if ($ok1 -ne "si") { Write-Host "`n  $rojo✖ Cancelado.$RST`n"; exit 1 }
 $ok2 = Read-Host "  Confirma de nuevo: escribi el total de IP (${total}) para continuar"
-if ($ok2 -ne "$total") { Write-Host "`n  $rojo✖ Cancelado: no coincide.$R`n"; exit 1 }
+if ($ok2 -ne "$total") { Write-Host "`n  $rojo✖ Cancelado: no coincide.$RST`n"; exit 1 }
 Write-Host ""
 
 if (-not $SoloVivos -and -not (Get-Command nmap -ErrorAction SilentlyContinue)) {
-  Write-Host "  $amar Falta nmap:  $blanco winget install Insecure.Nmap$R`n"; exit 1
+  Write-Host "  $amar Falta nmap:  $blanco winget install Insecure.Nmap$RST`n"; exit 1
 }
 
 # --- 3) Escaneo -----------------------------------------------------------------
@@ -120,12 +120,12 @@ for ($n = $nd; $n -le $nh; $n++) {
   $ip = Numero-A-IP $n
   $vivo = Test-Connection -ComputerName $ip -Count 1 -Quiet -ErrorAction SilentlyContinue
   if (-not $vivo) {
-    Write-Host (Fila "$ip" "$gris○ sin respuesta$R")
+    Write-Host (Fila "$ip" "$gris○ sin respuesta$RST")
     $resultados += [pscustomobject]@{ IP=$ip; Estado="sin respuesta"; Puertos="" }
     continue
   }
   if ($SoloVivos) {
-    Write-Host (Fila "$ip" "$verde● responde$R")
+    Write-Host (Fila "$ip" "$verde● responde$RST")
     $resultados += [pscustomobject]@{ IP=$ip; Estado="responde"; Puertos="(no revisado, -SoloVivos)" }
     continue
   }
@@ -133,7 +133,7 @@ for ($n = $nd; $n -le $nh; $n++) {
   $lineasAbiertos = $salida | Select-String -Pattern '^\d+/(tcp|udp)\s+open'
   $abiertos = $lineasAbiertos.Count
   $detalle = ($lineasAbiertos | ForEach-Object { ($_ -replace '\s+',' ').Trim() }) -join " | "
-  Write-Host (Fila "$ip" "$verde● responde$R $gris· $abiertos puerto(s) abierto(s)$R")
+  Write-Host (Fila "$ip" "$verde● responde$RST $gris· $abiertos puerto(s) abierto(s)$RST")
   $resultados += [pscustomobject]@{ IP=$ip; Estado="responde"; Puertos=$detalle }
 }
 
@@ -156,5 +156,5 @@ if ($rutaReporte) {
     $lineas += "{0,-16} | {1,-14} | {2}" -f $r.IP, $r.Estado, $r.Puertos
   }
   Set-Content -Path $rutaReporte -Value $lineas -Encoding UTF8
-  Write-Host "  $gris📄 Reporte guardado en: $blanco$rutaReporte$R`n"
+  Write-Host "  $gris📄 Reporte guardado en: $blanco$rutaReporte$RST`n"
 }

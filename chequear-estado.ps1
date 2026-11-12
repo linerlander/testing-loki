@@ -41,13 +41,13 @@ function Prueba-HTTP { param($url)
 
 function Texto-Status { param($code)
   switch ($code) {
-    200 {"$verde● 200 OK$R"; break}
-    {$_ -in 301,302,307,308} {"$cyan● $code redirige$R"; break}
-    403 {"$amar● 403 prohibido$R"; break}
-    404 {"$amar● 404 no existe$R"; break}
-    {$_ -ge 500} {"$rojo● $code caido$R"; break}
-    0   {"$rojo● sin respuesta$R"; break}
-    default {"$blanco● $code$R"}
+    200 {"$verde● 200 OK$RST"; break}
+    {$_ -in 301,302,307,308} {"$cyan● $code redirige$RST"; break}
+    403 {"$amar● 403 prohibido$RST"; break}
+    404 {"$amar● 404 no existe$RST"; break}
+    {$_ -ge 500} {"$rojo● $code caido$RST"; break}
+    0   {"$rojo● sin respuesta$RST"; break}
+    default {"$blanco● $code$RST"}
   }
 }
 
@@ -62,19 +62,19 @@ foreach ($o in $Objetivos) {
     $h=$o.Substring(0,$o.LastIndexOf(':')); $p=[int]$Matches[1]
     $conecta = Prueba-Puerto $h $p
     if (-not $conecta) {
-      Write-Host (Fila "$o" "$rojo● no conecta$R")
+      Write-Host (Fila "$o" "$rojo● no conecta$RST")
     } elseif ($p -in 80,8080) {
       $st=Prueba-HTTP "http://$h`:$p"; Write-Host (Fila "$o" (Texto-Status $st))
     } elseif ($p -in 443,8443) {
       $st=Prueba-HTTP "https://$h`:$p"; Write-Host (Fila "$o" (Texto-Status $st))
     } else {
-      Write-Host (Fila "$o" "$verde● conecta$R")
+      Write-Host (Fila "$o" "$verde● conecta$RST")
     }
   } else {
     # solo dominio -> prueba HTTP y HTTPS
     $st80 =Prueba-HTTP "http://$o"
     $st443=Prueba-HTTP "https://$o"
-    Write-Host (Texto "$lila▌$R $blanco$B$o$R")
+    Write-Host (Texto "$lila▌$RST $blanco$BLD$o$RST")
     Write-Host (Fila ":80  http" (Texto-Status $st80))
     Write-Host (Fila ":443 https" (Texto-Status $st443))
   }

@@ -10,8 +10,8 @@ function Color { param($hex)
   $r=[convert]::ToInt32($hex.Substring(0,2),16);$g=[convert]::ToInt32($hex.Substring(2,2),16);$b=[convert]::ToInt32($hex.Substring(4,2),16)
   "$($script:ESC)[38;2;$r;$g;${b}m" }
 
-$R    = "$($script:ESC)[0m"
-$B    = "$($script:ESC)[1m"
+$RST    = "$($script:ESC)[0m"
+$BLD    = "$($script:ESC)[1m"
 $verde  = Color "39ff78"
 $cyan   = Color "2ee6f0"
 $lila   = Color "b98cff"
@@ -33,8 +33,8 @@ function Banner { param($subtitulo = "")
   Write-Host ""
   for ($fila=0; $fila -lt 5; $fila++) {
     $c = Color $grad[$fila]
-    $linea = "   $c$B$($logo[$fila])$R"
-    if ($fila -eq 2 -and $subtitulo) { $linea += "   $gris$subtitulo$R" }
+    $linea = "   $c$BLD$($logo[$fila])$RST"
+    if ($fila -eq 2 -and $subtitulo) { $linea += "   $gris$subtitulo$RST" }
     Write-Host $linea
   }
   Write-Host ""
@@ -47,7 +47,7 @@ function New-Panel { param([int]$Ancho = 62) $script:PW = $Ancho }
 function Seccion { param($titulo, $colorHex = "2ee6f0")
   $c = Color $colorHex
   $rayas = $script:PW - 5 - $titulo.Length; if($rayas -lt 1){$rayas=1}
-  "  $c▌$R $B$blanco$titulo$R $gris" + ("─"*$rayas) + "$R" }
+  "  $c▌$RST $BLD$blanco$titulo$RST $gris" + ("─"*$rayas) + "$RST" }
 
 # Fila con relleno de puntos:  etiqueta ········· valor
 # Si no hay valor, se muestra como texto con sangria (sin puntos).
@@ -56,9 +56,9 @@ function Fila { param($etiqueta, $valor = "")
   $pe = ($etiqueta -replace "$($script:ESC)\[[0-9;]*m","")
   $pv = ($valor    -replace "$($script:ESC)\[[0-9;]*m","")
   $pts = $script:PW - 6 - $pe.Length - $pv.Length; if($pts -lt 2){$pts=2}
-  "    $blanco$etiqueta$R $gris" + ("·"*$pts) + "$R $valor" }
+  "    $blanco$etiqueta$RST $gris" + ("·"*$pts) + "$RST $valor" }
 
 # Linea suelta con sangria (sin relleno)
 function Texto { param($t) "    $t" }
 
-function Pie { param($txt) Write-Host "  $gris$txt$R"; Write-Host "" }
+function Pie { param($txt) Write-Host "  $gris$txt$RST"; Write-Host "" }
