@@ -13,21 +13,27 @@ function Color { param($hex)
 $R    = "$($script:ESC)[0m"
 $B    = "$($script:ESC)[1m"
 $verde  = Color "39ff78"
-$verde2 = Color "2ee6f0"
 $cyan   = Color "2ee6f0"
 $lila   = Color "b98cff"
-$gris   = Color "6f7b74"
+$gris   = Color "5f6b64"
 $rojo   = Color "ff5b5b"
 $amar   = Color "ffc23b"
 $blanco = Color "e8fff0"
 
-# Letras de LOKI en 3 colores (degradado cyan -> lila), estilo marca
+# Logo grande LOKI con degradado por letra (cyan -> lila), estilo marca LOKI
 function Banner { param($subtitulo = "")
-  $g1 = Color "2ee6f0"; $g2 = Color "6fb0ff"; $g3 = Color "b98cff"
+  $cL = Color "2ee6f0"; $cO = Color "5aa6ff"; $cK = Color "8f84ee"; $cI = Color "b98cff"
+  $letraL = @("██    ","██    ","██    ","██    ","██████")
+  $letraO = @("██████","██  ██","██  ██","██  ██","██████")
+  $letraK = @("██  ██","██ ██ ","████  ","██ ██ ","██  ██")
+  $letraI = @("██████"," ██   "," ██   "," ██   ","██████")
   Write-Host ""
-  Write-Host "  $g1$B█▀▀$R $g2$B█▀█$R $g2$B█ █$R $g3$B█$R    $gris┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄$R"
-  Write-Host "  $g1$B█▄▄$R $g2$B█▄█$R $g2$B█▀▄$R $g3$B█$R    $blanco$B·$R $gris testing-loki$R"
-  if ($subtitulo) { Write-Host "  $gris$subtitulo$R" }
+  for ($fila=0; $fila -lt 5; $fila++) {
+    $linea = "  $cL$B$($letraL[$fila])$R  $cO$B$($letraO[$fila])$R  $cK$B$($letraK[$fila])$R  $cI$B$($letraI[$fila])$R"
+    if ($fila -eq 2 -and $subtitulo) { $linea += "    $gris$subtitulo$R" }
+    Write-Host $linea
+  }
+  Write-Host "  $gris┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄$R  $lila testing-loki$R"
   Write-Host ""
 }
 
@@ -41,6 +47,12 @@ function PanelRow  { param($izq, $der = "")
   $pd = ($der -replace "$($script:ESC)\[[0-9;]*m","")
   $esp = $script:PW - 3 - $pi.Length - $pd.Length; if($esp -lt 1){$esp=1}
   "$cyan│$R $izq" + (" "*$esp) + "$der $cyan│$R" }
+# Fila estilo LOKI: etiqueta ····· valor (puntos de relleno)
+function PanelTabla { param($etiqueta, $valor)
+  $pe = ($etiqueta -replace "$($script:ESC)\[[0-9;]*m","")
+  $pv = ($valor    -replace "$($script:ESC)\[[0-9;]*m","")
+  $pts = $script:PW - 5 - $pe.Length - $pv.Length; if($pts -lt 2){$pts=2}
+  "$cyan│$R $blanco$etiqueta$R $gris" + ("·"*$pts) + "$R $valor $cyan│$R" }
 function PanelSep  { "$cyan├" + ("─"*($script:PW-2)) + "┤$R" }
 function PanelBot  { "$cyan╰" + ("─"*($script:PW-2)) + "╯$R" }
 

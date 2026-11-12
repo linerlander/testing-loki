@@ -43,12 +43,12 @@ function Prueba-HTTP { param($url)
 function Texto-Status { param($code)
   switch ($code) {
     200 {"$verde● 200 OK$R"; break}
-    {$_ -in 301,302,307,308} {"$cyan↪ $code redirige$R"; break}
-    403 {"$amar🔒 403 prohibido$R"; break}
-    404 {"$amar? 404 no existe$R"; break}
-    {$_ -ge 500} {"$rojo⚠ $code caido$R"; break}
-    0   {"$rojo✖ sin respuesta$R"; break}
-    default {"$blanco$code$R"}
+    {$_ -in 301,302,307,308} {"$cyan● $code redirige$R"; break}
+    403 {"$amar● 403 prohibido$R"; break}
+    404 {"$amar● 404 no existe$R"; break}
+    {$_ -ge 500} {"$rojo● $code caido$R"; break}
+    0   {"$rojo● sin respuesta$R"; break}
+    default {"$blanco● $code$R"}
   }
 }
 
@@ -62,25 +62,25 @@ foreach ($o in $Objetivos) {
     $h=$o.Substring(0,$o.LastIndexOf(':')); $p=[int]$Matches[1]
     $conecta = Prueba-Puerto $h $p
     if (-not $conecta) {
-      Write-Host (PanelRow "$blanco$o$R" "$rojo✖ no conecta$R")
+      Write-Host (PanelTabla "$o" "$rojo● no conecta$R")
     } elseif ($p -in 80,8080) {
-      $st=Prueba-HTTP "http://$h`:$p"; Write-Host (PanelRow "$blanco$o$R" (Texto-Status $st))
+      $st=Prueba-HTTP "http://$h`:$p"; Write-Host (PanelTabla "$o" (Texto-Status $st))
     } elseif ($p -in 443,8443) {
-      $st=Prueba-HTTP "https://$h`:$p"; Write-Host (PanelRow "$blanco$o$R" (Texto-Status $st))
+      $st=Prueba-HTTP "https://$h`:$p"; Write-Host (PanelTabla "$o" (Texto-Status $st))
     } else {
-      Write-Host (PanelRow "$blanco$o$R" "$verde● conecta (TCP)$R")
+      Write-Host (PanelTabla "$o" "$verde● conecta$R")
     }
   } else {
     # solo dominio -> prueba HTTP y HTTPS
     $st80 =Prueba-HTTP "http://$o"
     $st443=Prueba-HTTP "https://$o"
-    Write-Host (PanelRow "$blanco$o$R")
-    Write-Host (PanelRow "$gris   :80  http $R" (Texto-Status $st80))
-    Write-Host (PanelRow "$gris   :443 https$R" (Texto-Status $st443))
+    Write-Host (PanelRow "$lila▸ $blanco$o$R")
+    Write-Host (PanelTabla "  :80  http" (Texto-Status $st80))
+    Write-Host (PanelTabla "  :443 https" (Texto-Status $st443))
   }
 }
 Write-Host (PanelBot)
 Write-Host ""
-Write-Host "$gris  200 = responde bien · ✖ = no conecta · solo servidores propios$R"
+Write-Host "$gris  200 = responde bien · solo servidores propios$R"
 Write-Host ""
 
