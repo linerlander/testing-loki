@@ -1,5 +1,5 @@
 <#
- lib-panel.ps1 · Estilo compartido de los paneles de testing-loki.
+ lib-panel.ps1 · Estilo compartido, igual que el menu de LOKI.
  Lo cargan los otros scripts con:  . "$PSScriptRoot\lib-panel.ps1"
 #>
 $OutputEncoding = [System.Text.Encoding]::UTF8
@@ -20,42 +20,45 @@ $rojo   = Color "ff5b5b"
 $amar   = Color "ffc23b"
 $blanco = Color "e8fff0"
 
-# Logo grande LOKI con degradado por letra (cyan -> lila), estilo marca LOKI
+# Logo LOKI exacto del menu (con sombra), degradado cyan -> lila por fila
 function Banner { param($subtitulo = "")
-  $cL = Color "2ee6f0"; $cO = Color "5aa6ff"; $cK = Color "8f84ee"; $cI = Color "b98cff"
-  $letraL = @("██    ","██    ","██    ","██    ","██████")
-  $letraO = @("██████","██  ██","██  ██","██  ██","██████")
-  $letraK = @("██  ██","██ ██ ","████  ","██ ██ ","██  ██")
-  $letraI = @("██████"," ██   "," ██   "," ██   ","██████")
+  $logo = @(
+    "██╗      █████╗ ██╗  ██╗██╗",
+    "██║     ██╔══██╗██║ ██╔╝██║",
+    "██║     ██║  ██║█████╔╝ ██║",
+    "██║     ██║  ██║██╔═██╗ ██║",
+    "███████╗╚█████╔╝██║  ██╗██║"
+  )
+  $grad = @("2ee6f0","57b6f6","8f9bf2","a78cf4","b98cff")
   Write-Host ""
   for ($fila=0; $fila -lt 5; $fila++) {
-    $linea = "  $cL$B$($letraL[$fila])$R  $cO$B$($letraO[$fila])$R  $cK$B$($letraK[$fila])$R  $cI$B$($letraI[$fila])$R"
-    if ($fila -eq 2 -and $subtitulo) { $linea += "    $gris$subtitulo$R" }
+    $c = Color $grad[$fila]
+    $linea = "   $c$B$($logo[$fila])$R"
+    if ($fila -eq 2 -and $subtitulo) { $linea += "   $gris$subtitulo$R" }
     Write-Host $linea
   }
-  Write-Host "  $gris┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄$R  $lila testing-loki$R"
   Write-Host ""
 }
 
-# Cajas
+$script:PW = 62
 function New-Panel { param([int]$Ancho = 62) $script:PW = $Ancho }
-function PanelTop  { param($t)
-  $resto = $script:PW - 4 - $t.Length; if($resto -lt 1){$resto=1}
-  "$cyan╭─ $B$blanco$t$R $cyan" + ("─"*$resto) + "╮$R" }
-function PanelRow  { param($izq, $der = "")
-  $pi = ($izq -replace "$($script:ESC)\[[0-9;]*m","")
-  $pd = ($der -replace "$($script:ESC)\[[0-9;]*m","")
-  $esp = $script:PW - 3 - $pi.Length - $pd.Length; if($esp -lt 1){$esp=1}
-  "$cyan│$R $izq" + (" "*$esp) + "$der $cyan│$R" }
-# Fila estilo LOKI: etiqueta ····· valor (puntos de relleno)
-function PanelTabla { param($etiqueta, $valor)
+
+# Seccion a todo el ancho, estilo LOKI:  ▌ TITULO ──────────
+function Seccion { param($titulo, $colorHex = "2ee6f0")
+  $c = Color $colorHex
+  $rayas = $script:PW - 5 - $titulo.Length; if($rayas -lt 1){$rayas=1}
+  "  $c▌$R $B$blanco$titulo$R $gris" + ("─"*$rayas) + "$R" }
+
+# Fila con relleno de puntos:  etiqueta ········· valor
+# Si no hay valor, se muestra como texto con sangria (sin puntos).
+function Fila { param($etiqueta, $valor = "")
+  if ([string]::IsNullOrEmpty($valor)) { return "    $etiqueta" }
   $pe = ($etiqueta -replace "$($script:ESC)\[[0-9;]*m","")
   $pv = ($valor    -replace "$($script:ESC)\[[0-9;]*m","")
-  $pts = $script:PW - 5 - $pe.Length - $pv.Length; if($pts -lt 2){$pts=2}
-  "$cyan│$R $blanco$etiqueta$R $gris" + ("·"*$pts) + "$R $valor $cyan│$R" }
-function PanelSep  { "$cyan├" + ("─"*($script:PW-2)) + "┤$R" }
-function PanelBot  { "$cyan╰" + ("─"*($script:PW-2)) + "╯$R" }
+  $pts = $script:PW - 6 - $pe.Length - $pv.Length; if($pts -lt 2){$pts=2}
+  "    $blanco$etiqueta$R $gris" + ("·"*$pts) + "$R $valor" }
 
-function Pie { param($txt) Write-Host "$gris  $txt$R"; Write-Host "" }
+# Linea suelta con sangria (sin relleno)
+function Texto { param($t) "    $t" }
 
-New-Panel 62
+function Pie { param($txt) Write-Host "  $gris$txt$R"; Write-Host "" }

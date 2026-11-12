@@ -45,44 +45,45 @@ $salida | Select-String -Pattern '^\d+/(tcp|udp)\s+open' | ForEach-Object {
 
 Clear-Host
 Banner "auditor de servidores"
-Write-Host (PanelTop "AUDITORIA DE VPS")
-Write-Host (PanelRow "$blanco$Objetivo$R" "$gris$hora$R")
-Write-Host (PanelRow ("$gris" + "Estado:$R " + $(if($vivo){"$verde● responde$R"}else{"$amar○ sin ping$R"})) ("$gris $(if($Completo){'escaneo completo'}else{'escaneo rapido'})$R"))
-Write-Host (PanelBot)
+Write-Host (Seccion "AUDITORIA DE VPS")
+Write-Host (Fila "$blanco$Objetivo$R" "$gris$hora$R")
+Write-Host (Fila ("$gris" + "Estado:$R " + $(if($vivo){"$verde● responde$R"}else{"$amar○ sin ping$R"})) ("$gris $(if($Completo){'escaneo completo'}else{'escaneo rapido'})$R"))
+
 Write-Host ""
 
 # Dueno de la IP
-Write-Host (PanelTop "DUENO DE LA IP")
-Write-Host (PanelRow "$gris Proveedor:$R $blanco$org$R")
-Write-Host (PanelRow "$gris Lugar:$R $blanco$ciudad, $pais$R")
-if($cf){ Write-Host (PanelRow "$amar ⚑ Esta IP es de CLOUDFLARE$R") }
-else   { Write-Host (PanelRow "$verde ● IP directa del servidor (no Cloudflare)$R") }
-Write-Host (PanelBot)
+Write-Host (Seccion "DUENO DE LA IP")
+Write-Host (Fila "$gris Proveedor:$R $blanco$org$R")
+Write-Host (Fila "$gris Lugar:$R $blanco$ciudad, $pais$R")
+if($cf){ Write-Host (Fila "$amar ⚑ Esta IP es de CLOUDFLARE$R") }
+else   { Write-Host (Fila "$verde ● IP directa del servidor (no Cloudflare)$R") }
+
 Write-Host ""
 
 # Puertos
-Write-Host (PanelTop "PUERTOS ABIERTOS · $($puertos.Count)")
-if($puertos.Count -eq 0){ Write-Host (PanelRow "$gris Ninguno visible desde afuera.$R") }
+Write-Host (Seccion "PUERTOS ABIERTOS · $($puertos.Count)")
+if($puertos.Count -eq 0){ Write-Host (Fila "$gris Ninguno visible desde afuera.$R") }
 else { foreach($x in $puertos){
   $vv=$x.Vers; if($vv.Length -gt 24){$vv=$vv.Substring(0,24)}
-  Write-Host (PanelRow "$verde● $R$blanco$($x.Puerto.PadRight(9))$R$cyan$($x.Serv.PadRight(11))$R" "$gris$vv$R")
+  Write-Host (Fila "$verde● $R$blanco$($x.Puerto.PadRight(9))$R$cyan$($x.Serv.PadRight(11))$R" "$gris$vv$R")
 }}
-Write-Host (PanelBot)
+
 Write-Host ""
 
 # Avisos
-Write-Host (PanelTop "AVISOS DE SEGURIDAD")
+Write-Host (Seccion "AVISOS DE SEGURIDAD")
 $av=0
 function Chk { param($p) return ($texto -match $p) }
-if(Chk '23/tcp\s+open')  {Write-Host (PanelRow "$rojo✖ Telnet (23) abierto: inseguro$R");$av++}
-if(Chk '21/tcp\s+open')  {Write-Host (PanelRow "$amar! FTP (21): usa SFTP$R");$av++}
-if(Chk '3306/tcp\s+open'){Write-Host (PanelRow "$rojo✖ MySQL (3306) expuesto a internet$R");$av++}
-if(Chk '6379/tcp\s+open'){Write-Host (PanelRow "$rojo✖ Redis (6379) expuesto: peligroso$R");$av++}
-if(Chk '5432/tcp\s+open'){Write-Host (PanelRow "$amar! PostgreSQL (5432) expuesto$R");$av++}
-if(Chk '22/tcp\s+open')  {Write-Host (PanelRow "$gris i SSH (22) en puerto por defecto$R")}
-if($av -eq 0){ Write-Host (PanelRow "$verde✔ Sin alertas graves.$R") }
-Write-Host (PanelBot)
+if(Chk '23/tcp\s+open')  {Write-Host (Fila "$rojo✖ Telnet (23) abierto: inseguro$R");$av++}
+if(Chk '21/tcp\s+open')  {Write-Host (Fila "$amar! FTP (21): usa SFTP$R");$av++}
+if(Chk '3306/tcp\s+open'){Write-Host (Fila "$rojo✖ MySQL (3306) expuesto a internet$R");$av++}
+if(Chk '6379/tcp\s+open'){Write-Host (Fila "$rojo✖ Redis (6379) expuesto: peligroso$R");$av++}
+if(Chk '5432/tcp\s+open'){Write-Host (Fila "$amar! PostgreSQL (5432) expuesto$R");$av++}
+if(Chk '22/tcp\s+open')  {Write-Host (Fila "$gris i SSH (22) en puerto por defecto$R")}
+if($av -eq 0){ Write-Host (Fila "$verde✔ Sin alertas graves.$R") }
+
 Write-Host ""
 Write-Host "$gris  Hecho · $hora · solo servidores propios$R"
 Write-Host ""
+
 

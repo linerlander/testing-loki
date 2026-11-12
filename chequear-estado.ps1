@@ -18,7 +18,6 @@ if (-not $Objetivos -or $Objetivos.Count -eq 0) { $Objetivos = $LISTA }
 
 Banner "estado de servidores"
 
-New-Panel 62
 
 function Prueba-Puerto { param($h,$p)
   try {
@@ -53,7 +52,8 @@ function Texto-Status { param($code)
 }
 
 $hora=Get-Date -Format "HH:mm"
-Write-Host (PanelTop "ESTADO DE SERVIDORES · $hora")
+Write-Host (Seccion "ESTADO DE SERVIDORES · $hora")
+Write-Host ""
 
 foreach ($o in $Objetivos) {
   $o=$o.Trim(); if(-not $o){continue}
@@ -62,25 +62,24 @@ foreach ($o in $Objetivos) {
     $h=$o.Substring(0,$o.LastIndexOf(':')); $p=[int]$Matches[1]
     $conecta = Prueba-Puerto $h $p
     if (-not $conecta) {
-      Write-Host (PanelTabla "$o" "$rojo● no conecta$R")
+      Write-Host (Fila "$o" "$rojo● no conecta$R")
     } elseif ($p -in 80,8080) {
-      $st=Prueba-HTTP "http://$h`:$p"; Write-Host (PanelTabla "$o" (Texto-Status $st))
+      $st=Prueba-HTTP "http://$h`:$p"; Write-Host (Fila "$o" (Texto-Status $st))
     } elseif ($p -in 443,8443) {
-      $st=Prueba-HTTP "https://$h`:$p"; Write-Host (PanelTabla "$o" (Texto-Status $st))
+      $st=Prueba-HTTP "https://$h`:$p"; Write-Host (Fila "$o" (Texto-Status $st))
     } else {
-      Write-Host (PanelTabla "$o" "$verde● conecta$R")
+      Write-Host (Fila "$o" "$verde● conecta$R")
     }
   } else {
     # solo dominio -> prueba HTTP y HTTPS
     $st80 =Prueba-HTTP "http://$o"
     $st443=Prueba-HTTP "https://$o"
-    Write-Host (PanelRow "$lila▸ $blanco$o$R")
-    Write-Host (PanelTabla "  :80  http" (Texto-Status $st80))
-    Write-Host (PanelTabla "  :443 https" (Texto-Status $st443))
+    Write-Host (Texto "$lila▌$R $blanco$B$o$R")
+    Write-Host (Fila ":80  http" (Texto-Status $st80))
+    Write-Host (Fila ":443 https" (Texto-Status $st443))
   }
 }
-Write-Host (PanelBot)
 Write-Host ""
-Write-Host "$gris  200 = responde bien · solo servidores propios$R"
-Write-Host ""
+Pie "200 = responde bien · solo servidores propios"
+
 
