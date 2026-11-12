@@ -4,7 +4,7 @@
 #  servicios corren y avisos de seguridad básicos.
 #
 #  USO:   bash auditar-vps.sh <IP_O_DOMINIO>
-#  Ej:    bash auditar-vps.sh 190.183.229.172
+#  Ej:    bash auditar-vps.sh 203.0.113.10
 #
 #  ⚠️  Sólo sobre servidores TUYOS o que te hayan autorizado. Escanear algo
 #      ajeno sin permiso es ilegal: el script te lo pregunta antes de empezar.

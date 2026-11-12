@@ -176,7 +176,7 @@ function Clasificar { param($ping, $puertosRes)
             <RadioButton x:Name="RbRango" Content="Rango de IP" GroupName="modo"/>
 
             <TextBlock Text="ip objetivo" Style="{StaticResource EtiqSidebar}"/>
-            <TextBox x:Name="TxtObjetivo" Text="190.183.229.172"/>
+            <TextBox x:Name="TxtObjetivo" Text="203.0.113.10"/>
 
             <TextBlock Text="rango (desde / hasta)" Style="{StaticResource EtiqSidebar}"/>
             <Grid>

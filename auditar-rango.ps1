@@ -9,7 +9,7 @@
    .\auditar-rango.ps1 -Desde 192.168.1.1 -Hasta 192.168.1.20
 
  Ej (varios VPS tuyos seguidos, SOLO si son todos tuyos):
-   .\auditar-rango.ps1 -Desde 190.183.229.172 -Hasta 190.183.229.174
+   .\auditar-rango.ps1 -Desde 203.0.113.10 -Hasta 203.0.113.12
 
  Opciones:
    -SoloVivos        No escanea puertos: solo ve que IP responden (mas rapido)

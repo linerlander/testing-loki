@@ -4,8 +4,8 @@
  rango, con panel que se actualiza mientras corre.
 
  USO (una sola IP):
-   .\diagnostico.ps1 -Objetivo 190.183.229.172
-   .\diagnostico.ps1 -Objetivo 190.183.229.172 -Puertos 22,80,443,8080
+   .\diagnostico.ps1 -Objetivo 203.0.113.10
+   .\diagnostico.ps1 -Objetivo 203.0.113.10 -Puertos 22,80,443,8080
 
  USO (rango — mismas reglas que auditar-rango.ps1: tope 64, doble
  confirmacion, un bloque compartido con otros clientes de tu proveedor
@@ -14,7 +14,7 @@
 
  MONITOREO CONTINUO (vuelve a revisar cada N segundos y avisa cuando una
  IP cae o vuelve):
-   .\diagnostico.ps1 -Objetivo 190.183.229.172 -Monitoreo -IntervaloSeg 30
+   .\diagnostico.ps1 -Objetivo 203.0.113.10 -Monitoreo -IntervaloSeg 30
    .\diagnostico.ps1 -Desde 192.168.1.1 -Hasta 192.168.1.20 -Monitoreo
    (se corta con Ctrl+C)
 
