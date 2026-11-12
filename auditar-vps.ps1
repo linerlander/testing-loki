@@ -1,48 +1,11 @@
-<#
-=============================================================================
- auditar-vps.ps1  ·  Panel de auditoria de un VPS propio (desde Windows)
-
- USO:
-   .\auditar-vps.ps1 -Objetivo <IP_O_DOMINIO_TUYO>
-   .\auditar-vps.ps1 -Objetivo <IP> -Completo     (revisa los 65535 puertos)
-
- Ej:  .\auditar-vps.ps1 -Objetivo 190.183.229.172 -Completo
-
- Necesita nmap para Windows:  winget install Insecure.Nmap
-
- Solo sobre servidores TUYOS o con autorizacion. Escanear sistemas de
- terceros sin permiso es ilegal.
-=============================================================================
-#>
 param(
   [Parameter(Mandatory = $true)] [string]$Objetivo,
   [switch]$Completo
 )
 
-$OutputEncoding = [System.Text.Encoding]::UTF8
-try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
-$ESC = [char]27
-function C { param($hex)
-  $r=[convert]::ToInt32($hex.Substring(0,2),16); $g=[convert]::ToInt32($hex.Substring(2,2),16); $b=[convert]::ToInt32($hex.Substring(4,2),16)
-  "$ESC[38;2;$r;$g;${b}m" }
-$R="$ESC[0m"; $B="$ESC[1m"
-$verde=C "39ff78"; $cyan=C "2ee6f0"; $gris=C "6f7b74"; $rojo=C "ff5b5b"; $amar=C "ffc23b"; $blanco=C "e8fff0"
+. "$PSScriptRoot\lib-panel.ps1"
 
-$W = 60
-function Caja-Top   { param($t) $resto=$W-4-$t.Length; "$cyan╭─ $B$blanco$t$R $cyan" + ("─"*$resto) + "╮$R" }
-function Caja-Linea { param($izq,$der="")
-  $pi=($izq -replace "$ESC\[[0-9;]*m",""); $pd=($der -replace "$ESC\[[0-9;]*m","")
-  $esp=$W-3-$pi.Length-$pd.Length; if($esp -lt 1){$esp=1}
-  "$cyan│$R $izq" + (" "*$esp) + "$der $cyan│$R" }
-function Caja-Bot   { "$cyan╰" + ("─"*($W-2)) + "╯$R" }
-
-Clear-Host
-Write-Host ""
-Write-Host "$verde$B   ██       ██████  ██   ██ ██ $R   $gris testing-loki · auditor$R"
-Write-Host "$verde$B   ██      ██    ██ █████   ██ $R"
-Write-Host "$verde$B   ███████  ██████  ██   ██ ██ $R"
-Write-Host ""
-
+Banner "auditor de servidores"
 Write-Host "$amar  ⚠  Este servidor es TUYO o te autorizaron a escanearlo?$R"
 $ok = Read-Host "$blanco     escribi 'si' para continuar$R"
 if ($ok -ne "si") { Write-Host "$rojo  ✖ Cancelado. Solo servidores propios.$R`n"; exit 1 }
@@ -81,44 +44,45 @@ $salida | Select-String -Pattern '^\d+/(tcp|udp)\s+open' | ForEach-Object {
 }
 
 Clear-Host
-Write-Host ""
-Write-Host (Caja-Top "AUDITORIA DE VPS")
-Write-Host (Caja-Linea "$blanco$Objetivo$R" "$gris$hora$R")
-Write-Host (Caja-Linea ("$gris" + "Estado:$R " + $(if($vivo){"$verde● responde$R"}else{"$amar○ sin ping$R"})) ("$gris $(if($Completo){'escaneo completo'}else{'escaneo rapido'})$R"))
-Write-Host (Caja-Bot)
+Banner "auditor de servidores"
+Write-Host (PanelTop "AUDITORIA DE VPS")
+Write-Host (PanelRow "$blanco$Objetivo$R" "$gris$hora$R")
+Write-Host (PanelRow ("$gris" + "Estado:$R " + $(if($vivo){"$verde● responde$R"}else{"$amar○ sin ping$R"})) ("$gris $(if($Completo){'escaneo completo'}else{'escaneo rapido'})$R"))
+Write-Host (PanelBot)
 Write-Host ""
 
 # Dueno de la IP
-Write-Host (Caja-Top "DUENO DE LA IP")
-Write-Host (Caja-Linea "$gris Proveedor:$R $blanco$org$R")
-Write-Host (Caja-Linea "$gris Lugar:$R $blanco$ciudad, $pais$R")
-if($cf){ Write-Host (Caja-Linea "$amar ⚑ Esta IP es de CLOUDFLARE$R") }
-else   { Write-Host (Caja-Linea "$verde ● IP directa del servidor (no Cloudflare)$R") }
-Write-Host (Caja-Bot)
+Write-Host (PanelTop "DUENO DE LA IP")
+Write-Host (PanelRow "$gris Proveedor:$R $blanco$org$R")
+Write-Host (PanelRow "$gris Lugar:$R $blanco$ciudad, $pais$R")
+if($cf){ Write-Host (PanelRow "$amar ⚑ Esta IP es de CLOUDFLARE$R") }
+else   { Write-Host (PanelRow "$verde ● IP directa del servidor (no Cloudflare)$R") }
+Write-Host (PanelBot)
 Write-Host ""
 
 # Puertos
-Write-Host (Caja-Top "PUERTOS ABIERTOS · $($puertos.Count)")
-if($puertos.Count -eq 0){ Write-Host (Caja-Linea "$gris Ninguno visible desde afuera.$R") }
+Write-Host (PanelTop "PUERTOS ABIERTOS · $($puertos.Count)")
+if($puertos.Count -eq 0){ Write-Host (PanelRow "$gris Ninguno visible desde afuera.$R") }
 else { foreach($x in $puertos){
   $vv=$x.Vers; if($vv.Length -gt 24){$vv=$vv.Substring(0,24)}
-  Write-Host (Caja-Linea "$verde● $R$blanco$($x.Puerto.PadRight(9))$R$cyan$($x.Serv.PadRight(11))$R" "$gris$vv$R")
+  Write-Host (PanelRow "$verde● $R$blanco$($x.Puerto.PadRight(9))$R$cyan$($x.Serv.PadRight(11))$R" "$gris$vv$R")
 }}
-Write-Host (Caja-Bot)
+Write-Host (PanelBot)
 Write-Host ""
 
 # Avisos
-Write-Host (Caja-Top "AVISOS DE SEGURIDAD")
+Write-Host (PanelTop "AVISOS DE SEGURIDAD")
 $av=0
 function Chk { param($p) return ($texto -match $p) }
-if(Chk '23/tcp\s+open')  {Write-Host (Caja-Linea "$rojo✖ Telnet (23) abierto: inseguro$R");$av++}
-if(Chk '21/tcp\s+open')  {Write-Host (Caja-Linea "$amar! FTP (21): usa SFTP$R");$av++}
-if(Chk '3306/tcp\s+open'){Write-Host (Caja-Linea "$rojo✖ MySQL (3306) expuesto a internet$R");$av++}
-if(Chk '6379/tcp\s+open'){Write-Host (Caja-Linea "$rojo✖ Redis (6379) expuesto: peligroso$R");$av++}
-if(Chk '5432/tcp\s+open'){Write-Host (Caja-Linea "$amar! PostgreSQL (5432) expuesto$R");$av++}
-if(Chk '22/tcp\s+open')  {Write-Host (Caja-Linea "$gris i SSH (22) en puerto por defecto$R")}
-if($av -eq 0){ Write-Host (Caja-Linea "$verde✔ Sin alertas graves.$R") }
-Write-Host (Caja-Bot)
+if(Chk '23/tcp\s+open')  {Write-Host (PanelRow "$rojo✖ Telnet (23) abierto: inseguro$R");$av++}
+if(Chk '21/tcp\s+open')  {Write-Host (PanelRow "$amar! FTP (21): usa SFTP$R");$av++}
+if(Chk '3306/tcp\s+open'){Write-Host (PanelRow "$rojo✖ MySQL (3306) expuesto a internet$R");$av++}
+if(Chk '6379/tcp\s+open'){Write-Host (PanelRow "$rojo✖ Redis (6379) expuesto: peligroso$R");$av++}
+if(Chk '5432/tcp\s+open'){Write-Host (PanelRow "$amar! PostgreSQL (5432) expuesto$R");$av++}
+if(Chk '22/tcp\s+open')  {Write-Host (PanelRow "$gris i SSH (22) en puerto por defecto$R")}
+if($av -eq 0){ Write-Host (PanelRow "$verde✔ Sin alertas graves.$R") }
+Write-Host (PanelBot)
 Write-Host ""
 Write-Host "$gris  Hecho · $hora · solo servidores propios$R"
 Write-Host ""
+
