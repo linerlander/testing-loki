@@ -134,9 +134,6 @@ else
     printf '\n  %s✖ Hasta tiene que ser igual o mayor que Desde.%s\n\n' "$E_ERR" "$E_RST"; exit 1
   fi
   TOTAL=$(( NH - ND + 1 ))
-  if [ "$TOTAL" -gt 64 ]; then
-    printf '\n  %s✖ Ese rango tiene %s direcciones: el tope por corrida es 64.%s\n\n' "$E_ERR" "$TOTAL" "$E_RST"; exit 1
-  fi
   for ((n=ND; n<=NH; n++)); do IPS+=("$(num_a_ip "$n")"); done
 fi
 
@@ -167,6 +164,12 @@ read -rp "  $(printf "%sGuardar reporte TXT y CSV? (S/n):%s " "$E_TXT" "$E_RST")
 [[ "$REP" =~ ^[nN]$ ]] && GUARDAR=0 || GUARDAR=1
 CARPETA="$DIR/reportes"
 
+if [ "$ES_RANGO" -eq 1 ]; then
+  SEG_X_IP=$(( ${#PUERTOS[@]} * 3 ))
+  SEG_TOTAL=$(( ${#IPS[@]} * SEG_X_IP ))
+  printf '\n  %s⏱ %s direcciones · tiempo estimado: ~%s min (peor caso, si nada responde)%s\n' \
+    "$E_INFO" "${#IPS[@]}" "$(( (SEG_TOTAL + 59) / 60 ))" "$E_RST"
+fi
 printf '\n'
 caja_top "AUTORIZACION" "$E_WARN"
 caja_fila "$(printf '%sCada IP (o cada IP del rango) tiene que ser tuya%s' "$E_TXT" "$E_RST")"
